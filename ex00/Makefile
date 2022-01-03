@@ -6,7 +6,7 @@ RM		=	rm -f
 
 CFLAGS	=	-Wall -Wextra -Werror
 
-SRCS	=	main.cpp
+SRCS	=	main.cpp Number.cpp
 
 OBJS	:=	${SRCS:.cpp=.o}
 
