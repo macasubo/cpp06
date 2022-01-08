@@ -3,6 +3,16 @@
 
 #include <string>
 
+
+enum	e_type
+{
+	CHAR,
+	INT,
+	FLOAT,
+	DOUBLE,
+	NONE
+};
+
 class	Number
 {
 	public:
@@ -16,18 +26,26 @@ class	Number
 
 		std::string const &	getStr( void ) const;
 
-		char				toChar( void ) const;
-		int					toInt( void ) const;
-		double				toDouble( void ) const;
-		float				toFloat( void ) const;
+		void				toChar( void ) const;
+		void				toInt( void ) const;
+		void				toDouble( void ) const;
+		void				toFloat( void ) const;
 
 		class				ImpossibleException : public std::exception {};
+		class				NonDisplayableException : public std::exception {};
+
+		char				charN;
+		int					intN;
+		float				floatN;
+		double				doubleN;
 
 
 	private:
 
 		std::string const	str;
 		double				number;
+		e_type				type;
+		void				convert( void );
 
 
 };
