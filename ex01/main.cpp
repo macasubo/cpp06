@@ -3,12 +3,14 @@
 
 typedef struct 		Data_s
 {
-	char			a;
-	int				x;
+	char			c;
+	int				i;
+	float			f;
+	double			d;
 }					Data;
 
 
-static uintptr_t	serialize( Data *ptr )
+uintptr_t			serialize( Data *ptr )
 {
 	return( reinterpret_cast< uintptr_t >( ptr ) );
 }
@@ -22,15 +24,13 @@ Data				*deserialize( uintptr_t raw )
 
 int					main( void )
 {
-	Data			dataStart = { .a = 'a', .x = 42 };
+	Data			dataStart = { .c = 'a', .i = 42, .f = 4.2f, .d = 42.42 };
+	std::cout << "Start pointer : " << &dataStart << std::endl;
 
 	uintptr_t		raw = serialize( &dataStart );
-	
 	std::cout << "Int : " << raw << std::endl;
 
 	Data			*dataEnd = deserialize( raw );
-
-	std::cout << "Start pointer : " << &dataStart << std::endl;
 	std::cout << "End pointer : " << dataEnd << std::endl;
 
 	return 0;
