@@ -7,34 +7,35 @@
 #include <math.h>
 #include "Number.hpp"
 
-Number::Number( void ) : str( "0" )
-{
-	this->convert();
 
-	return ;
+const char	*Number::ImpossibleException::what() const throw()
+{
+	return "impossible";
 }
 
 
-Number::Number( std::string const & str ) : str( str )
+const char	*Number::NonDisplayableException::what() const throw()
 {
-	this->convert();
-
-	return ;
+	return "Non displayable";
 }
 
 
-Number::Number( Number const & src ) : str( src.str )
+Number::Number( void ) : _str( "0" )
 {
-	this->convert();
-
-	return ;
+	this->acquire();
 }
 
-
-Number::~Number( void )
+Number::Number( std::string const & str ) : _str( str )
 {
-	return ;
+	this->acquire();
 }
+
+Number::Number( Number const & src ) : _str( src._str )
+{
+	this->acquire();
+}
+
+Number::~Number( void ) {}
 
 
 Number &			Number::operator=( Number & operand )
@@ -47,7 +48,7 @@ Number &			Number::operator=( Number & operand )
 
 std::string const &		Number::getStr( void ) const
 {
-	return this->str;
+	return _str;
 }
 
 
@@ -57,34 +58,39 @@ void					Number::toChar( void ) const
 
 	try
 	{
-		switch( this->type )
+		switch( _type )
 		{
+			case CHAR:
+				if( !( static_cast<int>( _charN ) >= 32 && static_cast<int>( _charN ) <= 126 ) )
+					throw Number::NonDisplayableException();
+				a = _charN;
+				break;
 			case INT:
-				if( !( this->intN >= 32 && this->intN <= 126 ) )
+				if( !( _intN >= 32 && _intN <= 126 ) )
 				{
-					if ( this->intN >= 0 && this->intN <= 127 )
+					if( _intN >= 0 && _intN <= 127 )
 						throw Number::NonDisplayableException();
 					throw Number::ImpossibleException();
 				}
-				a = static_cast< char >( this->intN );
+				a = static_cast< char >( _intN );
 				break;
 			case FLOAT:
-				if( !( this->floatN >= 32 && this->floatN <= 126 ) )
+				if( !( _floatN >= 32.0f && _floatN <= 126.0f ) )
 				{
-					if( this->floatN >= 0 && this->floatN <= 127 )
+					if( _floatN >= 0.0f && _floatN <= 127.0f )
 						throw Number::NonDisplayableException();
 					throw Number::ImpossibleException();
 				}
-				a = static_cast< char >( this->floatN );
+				a = static_cast< char >( _floatN );
 				break;
 			case DOUBLE:
-				if( !( this->doubleN >= 32 && this->doubleN <= 126) )
+				if( !( _doubleN >= 32.0 && _doubleN <= 126.0 ) )
 				{
-					if( this->doubleN >= 0 && this->doubleN <= 127 )
+					if( _doubleN >= 0.0 && _doubleN <= 127.0 )
 						throw Number::NonDisplayableException();
 					throw Number::ImpossibleException();
 				}
-				a = static_cast< char >( this->doubleN );
+				a = static_cast< char >( _doubleN );
 				break;
 			default:
 				throw Number::ImpossibleException();
@@ -92,13 +98,9 @@ void					Number::toChar( void ) const
 		}
 		std::cout << "char: '" << a << "'" << std::endl;
 	}
-	catch( Number::NonDisplayableException & e )
+	catch( std::exception & e )
 	{
-		std::cout << "char: Non displayable" << std::endl;
-	}
-	catch( Number::ImpossibleException & e )
-	{
-		std::cout << "char: impossible" << std::endl;
+		std::cout << "char: " << e.what() << std::endl;
 	}
 
 	return ;
@@ -111,33 +113,33 @@ void					Number::toInt( void ) const
 
 	try
 	{
-		switch( this->type )
+		switch( _type )
 		{
 			case FLOAT:
-				if( this->floatN < static_cast< float >( std::numeric_limits<int>::lowest() )
-					|| this->floatN > static_cast< float >( std::numeric_limits<int>::max() )
-					|| isnan( this->floatN ) || isinf( this->floatN ) )
+				if( _floatN < static_cast< float >( std::numeric_limits<int>::lowest() )
+					|| _floatN > static_cast< float >( std::numeric_limits<int>::max() )
+					|| isnan( _floatN ) || isinf( _floatN ) )
 					throw Number::ImpossibleException();
-				x = static_cast< int >( this->floatN );
+				x = static_cast< int >( _floatN );
 				break;
 			case DOUBLE:
-				if( this->doubleN < static_cast< double >( std::numeric_limits<int>::lowest() )
-					|| this->doubleN > static_cast< double >( std::numeric_limits<int>::max() )
-					|| isnan( this->doubleN ) || isinf( this->doubleN ) )
+				if( _doubleN < static_cast< double >( std::numeric_limits<int>::lowest() )
+					|| _doubleN > static_cast< double >( std::numeric_limits<int>::max() )
+					|| isnan( _doubleN ) || isinf( _doubleN ) )
 					throw Number::ImpossibleException();
-				x = static_cast< int >( this->doubleN );
+				x = static_cast< int >( _doubleN );
 				break;
 			case INT:
-				x = this->intN;
+				x = _intN;
 				break;
 			default:
 				throw Number::ImpossibleException();
 		}
 		std::cout << "int: " << x << std::endl;
 	}
-	catch( Number::ImpossibleException & e )
+	catch( std::exception & e )
 	{
-		std::cout << "int: impossible" << std::endl;
+		std::cout << "int: " << e.what() << std::endl;
 	}
 
 	return ;
@@ -150,29 +152,29 @@ void					Number::toFloat( void ) const
 
 	try
 	{
-		switch( this->type )
+		switch( _type )
 		{
 			case FLOAT:
-				x = this->floatN;
+				x = _floatN;
 				break;
 			case INT:
-				x = static_cast< float >( this->intN );
+				x = static_cast< float >( _intN );
 				break;
 			case DOUBLE:
-				if( this->doubleN < static_cast< double >( std::numeric_limits<float>::lowest() )
-				|| this->doubleN > static_cast< double >( std::numeric_limits<float>::max() ) )
-					if( !isinf( this->doubleN ) )
+				if( _doubleN < static_cast< double >( std::numeric_limits<float>::lowest() )
+				|| _doubleN > static_cast< double >( std::numeric_limits<float>::max() ) )
+					if( !isinf( _doubleN ) )
 						throw Number::ImpossibleException();
-				x = static_cast< float >( this->doubleN );
+				x = static_cast< float >( _doubleN );
 				break;
 			default:
 				throw Number::ImpossibleException();
 		}
 		std::cout << "float: " << std::fixed << std::setprecision( 1 ) <<  x << "f" << std::endl;
 	}
-	catch( Number::ImpossibleException & e )
+	catch( std::exception & e )
 	{
-		std::cout << "float: impossible" << std::endl;
+		std::cout << "float: " << e.what() << std::endl;
 	}
 
 	return ;
@@ -185,25 +187,25 @@ void					Number::toDouble( void ) const
 
 	try
 	{
-		switch( this->type )
+		switch( _type )
 		{
 			case INT:
-				x = static_cast< double >( this->intN );
+				x = static_cast< double >( _intN );
 				break;
 			case FLOAT:
-				x = static_cast< double >( this->floatN );
+				x = static_cast< double >( _floatN );
 				break;
 			case DOUBLE:
-				x = this->doubleN;
+				x = _doubleN;
 				break;
 			default:
 				throw Number::ImpossibleException();
 		}
 		std::cout << "double: " << std::fixed << std::setprecision( 1 ) << x << std::endl;
 	}
-	catch( Number::ImpossibleException & e )
+	catch( std::exception & e )
 	{
-		std::cout << "double: impossible" << std::endl;
+		std::cout << "double: " << e.what() << std::endl;
 	}
 
 	return ;
@@ -212,50 +214,45 @@ void					Number::toDouble( void ) const
 
 
 
-void					Number::convert( void )
+void					Number::acquire( void )
 {
 
 	std::regex		float_regex("((\\+|-)?\\d+\\.\\d+f)|-inff|\\+inff|nanf");
 	std::regex		double_regex("((\\+|-)?\\d+\\.\\d+)|-inf|\\+inf|nan");
-	std::regex		int_regex("(\\+|-)?(\\d)+");
+	std::regex		int_regex("(\\+|-)?\\d+");
 
 	if( regex_match( this->getStr(), float_regex ) )
 	{
-		this->floatN = strtof( this->getStr().c_str(), NULL );
-		this->type = FLOAT;
+		_floatN = strtof( this->getStr().c_str(), NULL );
+		_type = FLOAT;
 	}
-	else if ( regex_match( this->getStr(), double_regex ) )
+	else if( regex_match( this->getStr(), double_regex ) )
 	{
-		this->doubleN = strtod( this->getStr().c_str(), NULL );
-		this->type = DOUBLE;
+		_doubleN = strtod( this->getStr().c_str(), NULL );
+		_type = DOUBLE;
 	}
 	else if( regex_match( this->getStr(), int_regex ) )
 	{
-		this->intN = atoi( this->getStr().c_str() );
-		this->type = INT;
+		_intN = atoi( this->getStr().c_str() );
+		_type = INT;
+	}
+	else if( this->getStr().length() == 1 )
+	{
+		_charN = this->getStr().c_str()[0];
+		_type = CHAR;
 	}
 	else
-	{
-		this->type = NONE;
-	}
-
-//	this->toDouble();
-//	this->toFloat();
-//	this->toChar();
-//	this->toInt();
+		_type = NONE;
 
 	return;
 
 }
 
 
-std::ostream &		operator<<( std::ostream & out, Number const & operand )
+void					Number::convert( void ) const
 {
-	
-	(void)out;
-	operand.toChar();
-	operand.toInt();
-	operand.toFloat();
-	operand.toDouble();
-	return out;
+	this->toChar();
+	this->toInt();
+	this->toFloat();
+	this->toDouble();
 }

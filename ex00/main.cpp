@@ -10,14 +10,13 @@ int			main( int argc, char **argv )
 		std::cout << "One argument needed." << std::endl;
 		return 0;
 	}
-
 	argv++;
 
 	std::string	const str = *argv;
 
 	Number	x = Number( str );
 
-	std::cout << x;
+	x.convert();
 
 	return 0;
 }

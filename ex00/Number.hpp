@@ -31,25 +31,27 @@ class	Number
 		void				toDouble( void ) const;
 		void				toFloat( void ) const;
 
-		class				ImpossibleException : public std::exception {};
-		class				NonDisplayableException : public std::exception {};
+		void				convert( void ) const;
 
-		char				charN;
-		int					intN;
-		float				floatN;
-		double				doubleN;
-
+		class				ImpossibleException : public std::exception {
+			public: virtual const char *what() const throw(); };
+		class				NonDisplayableException : public std::exception {
+			public: virtual const char *what() const throw(); };
 
 	private:
 
-		std::string const	str;
-		double				number;
-		e_type				type;
-		void				convert( void );
+		std::string const	_str;
+		char				_charN;
+		int					_intN;
+		float				_floatN;
+		double				_doubleN;
+		e_type				_type;
+
+		void				acquire( void );
+
 
 
 };
 
-std::ostream &				operator<<( std::ostream & out, Number const & operand );
 
 #endif
