@@ -3,7 +3,7 @@
 #include "Base.hpp"
 
 
-static Base		*generate( void )
+Base			*generate( void )
 {
 	int			random = rand() % 3;
 
@@ -15,7 +15,7 @@ static Base		*generate( void )
 }
 
 
-static void		identify( Base *p )
+void			identify( Base *p )
 {
 	if( dynamic_cast< A * >( p ) )
 		std::cout << "A" << std::endl;
@@ -28,7 +28,7 @@ static void		identify( Base *p )
 }
 
 
-static void		identify( Base &p )
+void			identify( Base &p )
 {
 	try
 	{
@@ -36,7 +36,7 @@ static void		identify( Base &p )
 		std::cout << "A" << std::endl;
 		return ;
 	}
-	catch( std::bad_cast &bc ) {}
+	catch( std::bad_cast & bc ) {}
 
 	try
 	{
