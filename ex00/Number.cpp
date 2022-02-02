@@ -40,7 +40,7 @@ Number::~Number( void ) {}
 
 Number &			Number::operator=( Number & operand )
 {
-	(void)operand;
+	static_cast< void >( operand );
 
 	return *this;
 }
@@ -254,20 +254,35 @@ void					Number::acquire( void )
 {
 
 	e_type		type = this->findType();
+	size_t		length = _str.length();
 
 	switch (type)
 	{
 		case FLOAT:
 			_floatN = strtof( this->getStr().c_str(), NULL );
-			_type = FLOAT;
+			if( length > 5 && _floatN > -2.0f && _floatN < 2.0f )
+				_type = NONE;
+			else
+				_type = FLOAT;
 			break;
 		case DOUBLE:
 			_doubleN = strtod( this->getStr().c_str(), NULL );
-			_type = DOUBLE;
+			if( length > 5 && _doubleN > -2.0 && _doubleN < 2.0 )
+				_type = NONE;
+			else
+				_type = DOUBLE;
 			break;
 		case INT:
-			_intN = atoi( this->getStr().c_str() );
-			_type = INT;
+			long int n = strtol( this->getStr().c_str(), NULL );
+			if(( length > 5 && n > -2 && n < 2 )
+				|| ( n < static_cast< long int >( std::numeric_limits<int>::min() )
+				|| n > static_cast< long int >( std::numeric_limits<int>::max() )))
+				type = NONE;
+			else
+			{
+				_intN = static_cast< int >( n );
+				_type = INT;
+			}
 			break;
 		default:
 			if( _str.length() == 1 )
