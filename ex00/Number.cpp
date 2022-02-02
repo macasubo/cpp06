@@ -255,25 +255,20 @@ void					Number::acquire( void )
 
 	e_type		type = this->findType();
 	size_t		length = _str.length();
+	long int	n;
 
 	switch (type)
 	{
 		case FLOAT:
 			_floatN = strtof( this->getStr().c_str(), NULL );
-			if( length > 5 && _floatN > -2.0f && _floatN < 2.0f )
-				_type = NONE;
-			else
-				_type = FLOAT;
+			_type = FLOAT;
 			break;
 		case DOUBLE:
 			_doubleN = strtod( this->getStr().c_str(), NULL );
-			if( length > 5 && _doubleN > -2.0 && _doubleN < 2.0 )
-				_type = NONE;
-			else
-				_type = DOUBLE;
+			_type = DOUBLE;
 			break;
 		case INT:
-			long int n = strtol( this->getStr().c_str(), NULL );
+			n = strtol( this->getStr().c_str(), NULL, 10 );
 			if(( length > 5 && n > -2 && n < 2 )
 				|| ( n < static_cast< long int >( std::numeric_limits<int>::min() )
 				|| n > static_cast< long int >( std::numeric_limits<int>::max() )))

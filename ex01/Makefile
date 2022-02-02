@@ -10,7 +10,7 @@ SRCS	=	main.cpp
 
 OBJS	:=	${SRCS:.cpp=.o}
 
-.PHONY: clean fclean re
+.PHONY: all clean fclean re
 
 
 all: ${NAME}
