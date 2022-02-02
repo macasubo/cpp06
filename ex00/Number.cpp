@@ -2,9 +2,9 @@
 #include <iostream>
 #include <iomanip>
 #include <ctype.h>
-#include <regex>
 #include <limits>
 #include <math.h>
+#include <stdlib.h>
 #include "Number.hpp"
 
 
@@ -116,14 +116,14 @@ void					Number::toInt( void ) const
 		switch( _type )
 		{
 			case FLOAT:
-				if( _floatN < static_cast< float >( std::numeric_limits<int>::lowest() )
+				if( _floatN < static_cast< float >( std::numeric_limits<int>::min() )
 					|| _floatN > static_cast< float >( std::numeric_limits<int>::max() )
 					|| isnan( _floatN ) || isinf( _floatN ) )
 					throw Number::ImpossibleException();
 				x = static_cast< int >( _floatN );
 				break;
 			case DOUBLE:
-				if( _doubleN < static_cast< double >( std::numeric_limits<int>::lowest() )
+				if( _doubleN < static_cast< double >( std::numeric_limits<int>::min() )
 					|| _doubleN > static_cast< double >( std::numeric_limits<int>::max() )
 					|| isnan( _doubleN ) || isinf( _doubleN ) )
 					throw Number::ImpossibleException();
@@ -161,10 +161,12 @@ void					Number::toFloat( void ) const
 				x = static_cast< float >( _intN );
 				break;
 			case DOUBLE:
-				if( _doubleN < static_cast< double >( std::numeric_limits<float>::lowest() )
+				if( _doubleN < -(static_cast< double >( std::numeric_limits<float>::max()))
 				|| _doubleN > static_cast< double >( std::numeric_limits<float>::max() ) )
+				{
 					if( !isinf( _doubleN ) )
 						throw Number::ImpossibleException();
+				}
 				x = static_cast< float >( _doubleN );
 				break;
 			default:
@@ -211,38 +213,71 @@ void					Number::toDouble( void ) const
 	return ;
 }
 
+e_type					Number::findType( void )
+{
+	const char			*str = _str.c_str();
+	size_t				index = 0;
 
+	if( _str.compare( "-inff" ) == 0 || _str.compare( "+inff" ) == 0 || _str.compare( "nanf" ) == 0 )
+		return FLOAT;
+	if( _str.compare( "-inf" ) == 0 || _str.compare( "+inf" ) == 0 || _str.compare( "nan" ) == 0 )
+		return DOUBLE;
 
+	if( !str || !str[index] )
+		return NONE;
+
+	if( str[index] == '-' || str[index] == '+' )
+		index++;
+
+	if( !isdigit( str[index] ) )
+		return NONE;
+	while( isdigit( str[index] ) )
+		index++;
+
+	if( !( str[index] == '.' ) )
+		return INT;
+	index++;
+
+	if( !isdigit( str[index] ) )
+		return INT;
+	while( isdigit( str[index] ) )
+		index++;
+
+	if( str[index] == 'f' )
+		return FLOAT;
+	else
+		return DOUBLE;
+		
+}
 
 void					Number::acquire( void )
 {
 
-	std::regex		float_regex("((\\+|-)?\\d+\\.\\d+f)|-inff|\\+inff|nanf");
-	std::regex		double_regex("((\\+|-)?\\d+\\.\\d+)|-inf|\\+inf|nan");
-	std::regex		int_regex("(\\+|-)?\\d+");
+	e_type		type = this->findType();
 
-	if( regex_match( this->getStr(), float_regex ) )
+	switch (type)
 	{
-		_floatN = strtof( this->getStr().c_str(), NULL );
-		_type = FLOAT;
+		case FLOAT:
+			_floatN = strtof( this->getStr().c_str(), NULL );
+			_type = FLOAT;
+			break;
+		case DOUBLE:
+			_doubleN = strtod( this->getStr().c_str(), NULL );
+			_type = DOUBLE;
+			break;
+		case INT:
+			_intN = atoi( this->getStr().c_str() );
+			_type = INT;
+			break;
+		default:
+			if( _str.length() == 1 )
+			{
+				_charN = this->getStr().c_str()[0];
+				_type = CHAR;
+			}
+			else
+				type = NONE;
 	}
-	else if( regex_match( this->getStr(), double_regex ) )
-	{
-		_doubleN = strtod( this->getStr().c_str(), NULL );
-		_type = DOUBLE;
-	}
-	else if( regex_match( this->getStr(), int_regex ) )
-	{
-		_intN = atoi( this->getStr().c_str() );
-		_type = INT;
-	}
-	else if( this->getStr().length() == 1 )
-	{
-		_charN = this->getStr().c_str()[0];
-		_type = CHAR;
-	}
-	else
-		_type = NONE;
 
 	return;
 

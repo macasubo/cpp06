@@ -4,13 +4,13 @@ CC		=	c++
 
 RM		=	rm -f
 
-CFLAGS	=	-Wall -Wextra -Werror
+CFLAGS	=	-Wall -Wextra -Werror -std=c++98
 
 SRCS	=	main.cpp Number.cpp
 
 OBJS	:=	${SRCS:.cpp=.o}
 
-.PHONY: clean fclean re
+.PHONY: all clean fclean re
 
 
 all: ${NAME}

@@ -47,6 +47,7 @@ class	Number
 		double				_doubleN;
 		e_type				_type;
 
+		e_type				findType( void );
 		void				acquire( void );
 
 
